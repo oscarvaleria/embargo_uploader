@@ -1,0 +1,93 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Embargo Documents Upload</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 30px;
+      background-color: #f5f5f5;
+    }
+    .section {
+      background-color: #fff;
+      border-radius: 8px;
+      padding: 25px;
+      margin-bottom: 30px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    label {
+      font-size: 16px;
+      display: block;
+      margin-bottom: 10px;
+    }
+    select, input[type="file"], button {
+      font-size: 16px;
+      padding: 8px 12px;
+      margin-top: 5px;
+      margin-bottom: 15px;
+    }
+    #response {
+      font-weight: bold;
+      margin-top: 15px;
+      color: green;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="section">
+    <h1>Upload embargo documents</h1>
+
+    <form id="uploadForm">
+      <label for="type">Tipo de embargo:</label>
+      <select id="type" name="type">
+        <option value="hacienda">Hacienda</option>
+        <option value="ss">Seguridad Social</option>
+      </select>
+
+      <label for="pdfs">Select one or more PDF files:</label>
+      <input type="file" id="pdfs" name="pdfs" accept="application/pdf" multiple required>
+
+      <br/>
+      <button type="submit">Upload</button>
+    </form>
+
+    <div id="response"></div>
+  </div>
+
+  <script>
+    document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const type = document.getElementById('type').value;
+      const files = document.getElementById('pdfs').files;
+      if (!files.length) return alert("Please select at least one file.");
+
+      const endpoint = type === "ss"
+        ? "https://valeriahr.app.n8n.cloud/webhook/863c1f89-9f94-4409-9a6d-5fd269ecfe08"
+        : "https://valeriahr.app.n8n.cloud/webhook/embargos";
+
+      const formData = new FormData();
+      for (const file of files) {
+        formData.append("files", file);
+      }
+
+      const res = await fetch(endpoint, {
+        method: "POST",
+        body: formData
+      });
+
+      if (res.ok) {
+        document.getElementById("response").textContent = "All files were uploaded successfully.";
+      } else {
+        document.getElementById("response").textContent = "Upload failed. Please try again.";
+      }
+    });
+  </script>
+</body>
+</html>
